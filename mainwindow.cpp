@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "qpainter.h"
 #include <QDebug>
+#include <math.h>
+#define PI 3.14159265
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->buildCub, SIGNAL(clicked(bool)),this,SLOT(displayCub()));
     connect(ui->displayBoundaries, SIGNAL(clicked(bool)),this,SLOT(displayboundaries()));
     connect(ui->buildSurface, SIGNAL(clicked(bool)),this,SLOT(displaySurface()));
+    connect(ui->turnSurface, SIGNAL(clicked(bool)),this,SLOT(turnSurface()));
 }
 
 MainWindow::~MainWindow()
@@ -47,7 +50,7 @@ void MainWindow::paintEvent(QPaintEvent *){
         p.setPen(QPen(Qt::black,3,Qt::SolidLine));
         for(int i = 0; i < 8; i++){
             p.drawPoint(displayDotsOfCub[i][0], displayDotsOfCub[i][1]);
-            qDebug() << "P" << i+1 << ": " << displayDotsOfCub[i][0] << displayDotsOfCub[i][1];
+            //qDebug() << "P" << i+1 << ": " << displayDotsOfCub[i][0] << displayDotsOfCub[i][1];
         }
         // соединяем точки куба
         p.setPen(QPen(Qt::black,1,Qt::DashLine));
@@ -70,7 +73,7 @@ void MainWindow::paintEvent(QPaintEvent *){
         p.setPen(QPen(Qt::red,5,Qt::SolidLine));
         for(int i = 0; i < 4; i++){
             p.drawPoint(displayDotsOfBorders[i][0], displayDotsOfBorders[i][1]);
-            qDebug() << "Bord P" << ": " << displayDotsOfBorders[i][0] << displayDotsOfBorders[i][1];
+            //qDebug() << "Bord P" << ": " << displayDotsOfBorders[i][0] << displayDotsOfBorders[i][1];
         }
         p.setPen(QPen(Qt::red,2,Qt::SolidLine));
         p.drawLine(displayDotsOfBorders[0][0], displayDotsOfBorders[0][1], displayDotsOfBorders[1][0], displayDotsOfBorders[1][1]);
@@ -81,9 +84,11 @@ void MainWindow::paintEvent(QPaintEvent *){
     // рисуем поверхность
     if(surfaceisCreate){
         p.setPen(QPen(Qt::red,1,Qt::SolidLine));
-        for(int i = 0; i < uCount; i++){
-            for(int j = 0; j < wCount; j++){
-            p.drawPoint(displayDotsofSurface[i][j][0], displayDotsofSurface[i][j][1]);
+        for(int i = 1; i < uCount; i++){
+            for(int j = 1; j < wCount; j++){
+                p.drawLine(displayDotsofSurface[i][j][0], displayDotsofSurface[i][j][1], displayDotsofSurface[i][j-1][0], displayDotsofSurface[i][j-1][1]);
+                p.drawLine(displayDotsofSurface[i][j][0], displayDotsofSurface[i][j][1], displayDotsofSurface[i-1][j][0], displayDotsofSurface[i-1][j][1]);
+                //p.drawPoint(displayDotsofSurface[i][j][0], displayDotsofSurface[i][j][1]);
             }
         }
     }
@@ -205,10 +210,10 @@ void MainWindow::displayboundaries(){
 }
 void MainWindow::displaySurface(){
     if(bordersIsCreate){
-        double*** surf;
+        surf;
         surface.createSurface();
         surf = surface.getSurface();
-    qDebug() << "displaySurface - я тут работаю";
+    //qDebug() << "displaySurface - я тут работаю";
         displayDotsofSurface = new double**[uCount];
         for(int i = 0; i < uCount; i++){
             displayDotsofSurface[i] = new double*[wCount];
@@ -216,7 +221,7 @@ void MainWindow::displaySurface(){
                 displayDotsofSurface[i][j] = new double[2];
             }
         }
-    qDebug() << "displaySurface - я тут работаю2";
+    //qDebug() << "displaySurface - я тут работаю2";
         for(int i = 0; i < uCount; i++){
             for(int j = 0; j < wCount;j++){
                 createDisplayCoordinateOfDot(surf[i][j][0],surf[i][j][1],surf[i][j][2]);
@@ -224,12 +229,225 @@ void MainWindow::displaySurface(){
                 displayDotsofSurface[i][j][1] = displayDot[1];
             }
         }
-    qDebug() << "displaySurface - я тут работаю3";
+    //qDebug() << "displaySurface - я тут работаю3";
         surfaceisCreate = true;
         this->update();
     }else{
         surfaceisCreate = false;
     }
 }
+void MainWindow::turnSurface(){
+    bool angleTurnXBool, angleTurnYBool, angleTurnZBool;
+    double angleTurnX, angleTurnY, angleTurnZ;
+    angleTurnX = ui->angleTurnX->text().toDouble(&angleTurnXBool);
+    angleTurnY = ui->angleTurnY->text().toDouble(&angleTurnYBool);
+    angleTurnZ = ui->angleTurnZ->text().toDouble(&angleTurnZBool);
+    if(angleTurnXBool){
+        surface.createTurnMatrixX(angleTurnX);
+        surface.turnSurfaceAboutX();
+        createTurnMatrixX(angleTurnX);
+        turnCubAboutX();
+        turnBordersAboutX();
+    }
+    if(angleTurnYBool){
+        surface.createTurnMatrixY(angleTurnY);
+        surface.turnSurfaceAboutY();
+        createTurnMatrixY(angleTurnY);
+        turnCubAboutY();
+        turnBordersAboutY();
+    }
+    if(angleTurnZBool){
+        surface.createTurnMatrixZ(angleTurnZ);
+        surface.turnSurfaceAboutZ();
+        createTurnMatrixZ(angleTurnZ);
+        turnCubAboutZ();
+        turnBordersAboutZ();
+    }
+    if(angleTurnXBool || angleTurnYBool || angleTurnZBool){
+        if(bordersIsCreate){
+            surf;
+            surf = surface.getSurface();
+        //qDebug() << "turnSurface - я тут работаю2";
+            for(int i = 0; i < uCount; i++){
+                for(int j = 0; j < wCount;j++){
+                    createDisplayCoordinateOfDot(surf[i][j][0],surf[i][j][1],surf[i][j][2]);
+                    displayDotsofSurface[i][j][0] = displayDot[0];
+                    displayDotsofSurface[i][j][1] = displayDot[1];
+                }
+            }
+        //qDebug() << "turnSurface - я тут работаю3";
+            surfaceisCreate = true;
+            this->update();
+        }else{
+            surfaceisCreate = false;
+        }
+    }
+}
 
+void MainWindow::createTurnMatrixX(double alphaX){
+    turnMatrixX[0][0] = 1;
+    turnMatrixX[0][1] = 0;
+    turnMatrixX[0][2] = 0;
+    turnMatrixX[1][0] = 0;
+    turnMatrixX[1][1] = cos(alphaX*PI/180);
+    turnMatrixX[1][2] = -sin(alphaX*PI/180);
+    turnMatrixX[2][0] = 0;
+    turnMatrixX[2][1] = sin(alphaX*PI/180);
+    turnMatrixX[2][2] = cos(alphaX*PI/180);
+}
+void MainWindow::createTurnMatrixY(double alphaY){
+    turnMatrixY[0][0] = cos(alphaY*PI/180);
+    turnMatrixY[0][1] = 0;
+    turnMatrixY[0][2] = sin(alphaY*PI/180);
+    turnMatrixY[1][0] = 0;
+    turnMatrixY[1][1] = 1;
+    turnMatrixY[1][2] = 0;
+    turnMatrixY[2][0] = -sin(alphaY*PI/180);
+    turnMatrixY[2][1] = 0;
+    turnMatrixY[2][2] = cos(alphaY*PI/180);
+}
+void MainWindow::createTurnMatrixZ(double alphaZ){
+    turnMatrixZ[0][0] = cos(alphaZ*PI/180);
+    turnMatrixZ[0][1] = -sin(alphaZ*PI/180);
+    turnMatrixZ[0][2] = 0;
+    turnMatrixZ[1][0] = sin(alphaZ*PI/180);
+    turnMatrixZ[1][1] = cos(alphaZ*PI/180);
+    turnMatrixZ[1][2] = 0;
+    turnMatrixZ[2][0] = 0;
+    turnMatrixZ[2][1] = 0;
+    turnMatrixZ[2][2] = 1;
+}
 
+void MainWindow::turnCubAboutX(){
+    double coord[3];
+    for(int i = 0; i < 8; i++){
+            // поворачиваем куб
+            coord[0] = cub[i][0];
+            coord[1] = cub[i][1];
+            coord[2] = cub[i][2];
+            cub[i][0] = coord[0]*turnMatrixX[0][0] +
+                        coord[1]*turnMatrixX[0][1] +
+                        coord[2]*turnMatrixX[0][2];
+            cub[i][1] = coord[0]*turnMatrixX[1][0] +
+                        coord[1]*turnMatrixX[1][1] +
+                        coord[2]*turnMatrixX[1][2];
+            cub[i][2] = coord[0]*turnMatrixX[2][0] +
+                        coord[1]*turnMatrixX[2][1] +
+                        coord[2]*turnMatrixX[2][2];
+            // переводим в координаты дисплея
+            createDisplayCoordinateOfDot(cub[i][0], cub[i][1], cub[i][2]);
+            displayDotsOfCub[i][0] = displayDot[0];
+            displayDotsOfCub[i][1] = displayDot[1];
+    }
+
+}
+void MainWindow::turnCubAboutY(){
+    double coord[3];
+    for(int i = 0; i < 8; i++){
+            // поворачиваем куб
+            coord[0] = cub[i][0];
+            coord[1] = cub[i][1];
+            coord[2] = cub[i][2];
+            cub[i][0] = coord[0]*turnMatrixY[0][0] +
+                        coord[1]*turnMatrixY[0][1] +
+                        coord[2]*turnMatrixY[0][2];
+            cub[i][1] = coord[0]*turnMatrixY[1][0] +
+                        coord[1]*turnMatrixY[1][1] +
+                        coord[2]*turnMatrixY[1][2];
+            cub[i][2] = coord[0]*turnMatrixY[2][0] +
+                        coord[1]*turnMatrixY[2][1] +
+                        coord[2]*turnMatrixY[2][2];
+            // переводим в координаты дисплея
+            createDisplayCoordinateOfDot(cub[i][0], cub[i][1], cub[i][2]);
+            displayDotsOfCub[i][0] = displayDot[0];
+            displayDotsOfCub[i][1] = displayDot[1];
+    }
+}
+void MainWindow::turnCubAboutZ(){
+    double coord[3];
+    for(int i = 0; i < 8; i++){
+            // поворачиваем куб
+            coord[0] = cub[i][0];
+            coord[1] = cub[i][1];
+            coord[2] = cub[i][2];
+            cub[i][0] = coord[0]*turnMatrixZ[0][0] +
+                        coord[1]*turnMatrixZ[0][1] +
+                        coord[2]*turnMatrixZ[0][2];
+            cub[i][1] = coord[0]*turnMatrixZ[1][0] +
+                        coord[1]*turnMatrixZ[1][1] +
+                        coord[2]*turnMatrixZ[1][2];
+            cub[i][2] = coord[0]*turnMatrixZ[2][0] +
+                        coord[1]*turnMatrixZ[2][1] +
+                        coord[2]*turnMatrixZ[2][2];
+            // переводим в координаты дисплея
+            createDisplayCoordinateOfDot(cub[i][0], cub[i][1], cub[i][2]);
+            displayDotsOfCub[i][0] = displayDot[0];
+            displayDotsOfCub[i][1] = displayDot[1];
+    }
+}
+void MainWindow::turnBordersAboutX(){
+    double coord[3];
+    for(int i = 0; i < 4; i++){
+            // поворачиваем границы
+            coord[0] = borders[i][0];
+            coord[1] = borders[i][1];
+            coord[2] = borders[i][2];
+            borders[i][0] = coord[0]*turnMatrixX[0][0] +
+                            coord[1]*turnMatrixX[0][1] +
+                            coord[2]*turnMatrixX[0][2];
+            borders[i][1] = coord[0]*turnMatrixX[1][0] +
+                            coord[1]*turnMatrixX[1][1] +
+                            coord[2]*turnMatrixX[1][2];
+            borders[i][2] = coord[0]*turnMatrixX[2][0] +
+                            coord[1]*turnMatrixX[2][1] +
+                            coord[2]*turnMatrixX[2][2];
+            // переводим в координаты дисплея
+            createDisplayCoordinateOfDot(borders[i][0], borders[i][1], borders[i][2]);
+            displayDotsOfBorders[i][0] = displayDot[0];
+            displayDotsOfBorders[i][1] = displayDot[1];
+    }
+}
+void MainWindow::turnBordersAboutY(){
+    double coord[3];
+    for(int i = 0; i < 4; i++){
+            // поворачиваем границы
+            coord[0] = borders[i][0];
+            coord[1] = borders[i][1];
+            coord[2] = borders[i][2];
+            borders[i][0] = coord[0]*turnMatrixY[0][0] +
+                            coord[1]*turnMatrixY[0][1] +
+                            coord[2]*turnMatrixY[0][2];
+            borders[i][1] = coord[0]*turnMatrixY[1][0] +
+                            coord[1]*turnMatrixY[1][1] +
+                            coord[2]*turnMatrixY[1][2];
+            borders[i][2] = coord[0]*turnMatrixY[2][0] +
+                            coord[1]*turnMatrixY[2][1] +
+                            coord[2]*turnMatrixY[2][2];
+            // переводим в координаты дисплея
+            createDisplayCoordinateOfDot(borders[i][0], borders[i][1], borders[i][2]);
+            displayDotsOfBorders[i][0] = displayDot[0];
+            displayDotsOfBorders[i][1] = displayDot[1];
+    }
+}
+void MainWindow::turnBordersAboutZ(){
+    double coord[3];
+    for(int i = 0; i < 4; i++){
+            // поворачиваем границы
+            coord[0] = borders[i][0];
+            coord[1] = borders[i][1];
+            coord[2] = borders[i][2];
+            borders[i][0] = coord[0]*turnMatrixZ[0][0] +
+                            coord[1]*turnMatrixZ[0][1] +
+                            coord[2]*turnMatrixZ[0][2];
+            borders[i][1] = coord[0]*turnMatrixZ[1][0] +
+                            coord[1]*turnMatrixZ[1][1] +
+                            coord[2]*turnMatrixZ[1][2];
+            borders[i][2] = coord[0]*turnMatrixZ[2][0] +
+                            coord[1]*turnMatrixZ[2][1] +
+                            coord[2]*turnMatrixZ[2][2];
+            // переводим в координаты дисплея
+            createDisplayCoordinateOfDot(borders[i][0], borders[i][1], borders[i][2]);
+            displayDotsOfBorders[i][0] = displayDot[0];
+            displayDotsOfBorders[i][1] = displayDot[1];
+    }
+}

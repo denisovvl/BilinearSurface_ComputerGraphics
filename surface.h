@@ -10,13 +10,15 @@ private:
     static const int MAX_U = 100;
     static const int MIN_W = 0;
     static const int MAX_W = 100;
-
+    double turnMatrixX[3][3]; // матрица поворота для оси X
+    double turnMatrixY[3][3]; // матрица поворота для оси Y
+    double turnMatrixZ[3][3]; // матрица поворота для оси Z
 
 
 public:
     Surface();
-    static const int uCount = MAX_U/3;
-    static const int wCount = MAX_W/3;
+    static const int uCount = MAX_U/3 + 1; // Добавляем еще по одному элеvенту для u/w = 1
+    static const int wCount = MAX_W/3 + 1;
     //static const int countOfDotsOnSurface = uCount*wCount;
     double*** surface;
     void setp00(double*);
@@ -29,6 +31,12 @@ public:
     double* getp10();
     void createSurface();
     double*** getSurface();
+    void createTurnMatrixX(double);
+    void createTurnMatrixY(double);
+    void createTurnMatrixZ(double);
+    void turnSurfaceAboutX();
+    void turnSurfaceAboutY();
+    void turnSurfaceAboutZ();
     void reset();
 };
 

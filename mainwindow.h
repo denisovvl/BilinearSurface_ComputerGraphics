@@ -58,12 +58,27 @@ private:
 
     int uCount;
     int wCount;
+    double*** surf;
     double*** displayDotsofSurface;
+
+    double turnMatrixX[3][3]; // матрица поворота для оси X
+    double turnMatrixY[3][3]; // матрица поворота для оси Y
+    double turnMatrixZ[3][3]; // матрица поворота для оси Z
+    void createTurnMatrixX(double);
+    void createTurnMatrixY(double);
+    void createTurnMatrixZ(double);
+    void turnCubAboutX();
+    void turnCubAboutY();
+    void turnCubAboutZ();
+    void turnBordersAboutX();
+    void turnBordersAboutY();
+    void turnBordersAboutZ();
 
 public slots:
     void displayCub();
     void displaySurface();
     void displayboundaries();
+    void turnSurface();
 };
 
 #endif // MAINWINDOW_H

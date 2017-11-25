@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>625</width>
-    <height>561</height>
+    <width>652</width>
+    <height>729</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -690,13 +690,95 @@
      <string>Построить поверхность</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_14">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>512</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>X</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="angleTurnX">
+    <property name="geometry">
+     <rect>
+      <x>32</x>
+      <y>510</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_15">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>542</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Y</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="angleTurnY">
+    <property name="geometry">
+     <rect>
+      <x>32</x>
+      <y>540</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_16">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>572</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Z</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="angleTurnZ">
+    <property name="geometry">
+     <rect>
+      <x>32</x>
+      <y>570</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="turnSurface">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>600</y>
+      <width>157</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Повернуть фигуру</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>625</width>
+     <width>652</width>
      <height>20</height>
     </rect>
    </property>
