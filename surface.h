@@ -19,7 +19,6 @@ public:
     Surface();
     static const int uCount = MAX_U/3 + 1; // Добавляем еще по одному элеvенту для u/w = 1
     static const int wCount = MAX_W/3 + 1;
-    //static const int countOfDotsOnSurface = uCount*wCount;
     double*** surface;
     void setp00(double*);
     void setp01(double*);
