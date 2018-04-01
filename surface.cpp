@@ -47,7 +47,7 @@ void Surface::createSurface(){
         for(int j = 0; j < wCount; j++)
             surface[i][j] = new double[3];
     }
-    // вообще тут можно оптимизировать расчет коэффициентов, но мне влом. Вроде и так норм работает. Но можно сделать быстрее
+   
     int uIndex = 0;
     int wIndex = 0;
     double a, b, c, d;
